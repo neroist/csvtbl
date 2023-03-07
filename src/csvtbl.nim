@@ -61,8 +61,6 @@ proc main =
     filename = win.saveFile()
     saveFile()
 
-    win.title = filename.extractFilename()
-
   fileMenu.addQuitItem() do () -> bool:
     window.destroy()
     return true
