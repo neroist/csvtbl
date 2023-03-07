@@ -36,14 +36,14 @@ proc main =
   let fileMenu = newMenu("File")
   fileMenu.addItem("Open") do (_: MenuItem, win: Window):
     filename = win.openFile()
-    win.title = filename
+    win.title = filename.extractFilename()
 
   fileMenu.addQuitItem() do () -> bool: 
     return true
 
   window = newWindow("", 800, 600, true)
   window.margined = true
-  window.title = filename
+  window.title = filename.extractFilename()
 
   let box = newHorizontalBox(true)
   window.child = box
