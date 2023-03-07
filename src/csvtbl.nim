@@ -57,15 +57,15 @@ proc main =
 
   let fileMenu = newMenu("File")
 
-  fileMenu.addItem("Save") do (m: MenuItem, win: Window):
+  fileMenu.addItem("Save") do (_: MenuItem, win: Window):
     saveFile()
 
-  fileMenu.addCheckItem("Enable AutoSave") do (m: MenuItem, win: Window):
-    autoSave = m.checked
+  fileMenu.addCheckItem("Enable AutoSave") do (item: MenuItem, _: Window):
+    autoSave = item.checked
 
   fileMenu.addSeparator()
 
-  fileMenu.addItem("Save As") do (m: MenuItem, win: Window):
+  fileMenu.addItem("Save As") do (_: MenuItem, win: Window):
     saveFile(win.saveFile())
 
   fileMenu.addQuitItem() do () -> bool:
