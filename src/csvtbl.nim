@@ -47,7 +47,9 @@ proc modelSetCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, 
     saveFile()
 
 proc main =
-  var window: Window
+  var 
+    window: Window
+    table: Table
 
   let fileMenu = newMenu("File")
 
@@ -57,12 +59,19 @@ proc main =
   fileMenu.addCheckItem("Enable AutoSave") do (m: MenuItem, win: Window):
     autoSave = m.checked
 
+  fileMenu.addSeparator()
+
   fileMenu.addItem("Save As") do (m: MenuItem, win: Window):
     saveFile(win.saveFile())
 
   fileMenu.addQuitItem() do () -> bool:
     window.destroy()
     return true
+
+  let editMenu = newMenu("Edit")
+
+  editMenu.addItem("Select All") do (m: MenuItem, win: Window):
+    table.selection = (0 .. len(rows)-1).toSeq()
 
   window = newWindow("", 800, 600, true)
   window.margined = true
@@ -86,7 +95,7 @@ proc main =
   params.model = model.impl
   params.rowBackgroundColorModelColumn = -1
 
-  let table = newTable(addr params)
+  table = newTable(addr params)
   table.selectionMode = TableSelectionModeZeroOrMany
 
   table.addTextColumn("Row", 0, TableModelColumnNeverEditable)
