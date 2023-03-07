@@ -21,14 +21,16 @@ proc modelCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col
   if col == 0:
     return newTableValue($(row+1)).impl
 
-  for idx, val in csvRows(filename).toSeq():
-    if idx < 1: continue
+  let rows = csvRows(filename).toSeq()
+
+  for idx, val in rows:
+    if idx == 0: continue
     
     if idx == row + 1:
       return newTableValue(val[col - 1]).impl
 
 proc modelSetCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col: cint, val: ptr rawui.TableValue) {.cdecl.} =
-  discard # For now...
+  discard
 
 proc main =
   var window: Window
