@@ -17,14 +17,14 @@ var
   rows = csvRows(filename).toSeq()
   autoSave: bool
 
-proc saveFile =
+proc saveFile(file: string = filename) =
   var writeStr: string
 
   for csvRow in rows:
     writestr.add csvRow.join(",")
     writeStr.add '\n'
 
-  filename.writeFile(writeStr)
+  file.writeFile(writeStr)
 
 proc modelNumColumns(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(csvRows(filename).toSeq()[0])
 proc modelNumRows(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(csvRows(filename).toSeq()) - 1
@@ -56,6 +56,12 @@ proc main =
 
   fileMenu.addCheckItem("Enable AutoSave") do (m: MenuItem, win: Window):
     autoSave = m.checked
+
+  fileMenu.addItem("Save As") do (m: MenuItem, win: Window):
+    filename = win.saveFile()
+    saveFile()
+
+    win.title = filename.extractFilename()
 
   fileMenu.addQuitItem() do () -> bool:
     window.destroy()
