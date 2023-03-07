@@ -37,10 +37,14 @@ proc modelCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col
   for idx, val in rows:
     if idx < 1: continue
     
+    # row 0 in `rows` are the headers
     if idx == row + 1:
+      # col 0 is the Row column
       return newTableValue(val[col - 1]).impl
 
 proc modelSetCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col: cint, val: ptr rawui.TableValue) {.cdecl.} =
+  # col 0 is the "Row" column
+  # row 0 in `rows` are the headers
   rows[row + 1][col - 1] = $rawui.tableValueString(val)
 
   if autoSave:
