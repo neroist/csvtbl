@@ -11,7 +11,9 @@ if paramCount() < 1:
 
   quit QuitFailure
 
-var filename = paramStr(1)
+var 
+  filename = paramStr(1)
+  rows = csvRows(filename).toSeq()
 
 proc modelNumColumns(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(csvRows(filename).toSeq()[0])
 proc modelNumRows(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(csvRows(filename).toSeq()) - 1
@@ -21,7 +23,7 @@ proc modelCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col
   if col == 0:
     return newTableValue($(row+1)).impl
 
-  for idx, val in csvRows(filename).toSeq():
+  for idx, val in rows:
     if idx < 1: continue
     
     if idx == row + 1:
@@ -34,16 +36,14 @@ proc main =
   var window: Window
 
   let fileMenu = newMenu("File")
-  fileMenu.addItem("Open") do (_: MenuItem, win: Window):
-    filename = win.openFile()
-    win.title = filename
 
-  fileMenu.addQuitItem() do () -> bool: 
+  fileMenu.addQuitItem() do () -> bool:
+    window.destroy()
     return true
 
   window = newWindow("", 800, 600, true)
   window.margined = true
-  window.title = filename
+  window.title = filename.extractFilename()
 
   let box = newHorizontalBox(true)
   window.child = box
