@@ -1,3 +1,3 @@
 # csvtbl
 
-A simple, CSV file table viewer.
+A simple CSV file table viewer & editor.
