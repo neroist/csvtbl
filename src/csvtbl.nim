@@ -26,8 +26,8 @@ proc saveFile(file: string = filename) =
 
   file.writeFile(writeStr)
 
-proc modelNumColumns(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(csvRows(filename).toSeq()[0])
-proc modelNumRows(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(csvRows(filename).toSeq()) - 1
+proc modelNumColumns(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(rows[0])
+proc modelNumRows(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(rows) - 1
 proc modelColumnType(mh: ptr TableModelHandler, m: ptr rawui.TableModel, col: cint): TableValueType {.cdecl.} = TableValueTypeString
 
 proc modelCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col: cint): ptr rawui.TableValue {.cdecl.} =
@@ -104,7 +104,7 @@ proc main =
 
   table.addTextColumn("Row", 0, TableModelColumnNeverEditable)
 
-  for idx, header in csvRows(filename).toSeq()[0]:
+  for idx, header in rows[0]:
     table.addTextColumn(header, idx + 1, TableModelColumnAlwaysEditable)
 
   box.add table, true
