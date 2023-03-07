@@ -58,8 +58,7 @@ proc main =
     autoSave = m.checked
 
   fileMenu.addItem("Save As") do (m: MenuItem, win: Window):
-    filename = win.saveFile()
-    saveFile()
+    saveFile(win.saveFile())
 
   fileMenu.addQuitItem() do () -> bool:
     window.destroy()
