@@ -1,9 +1,9 @@
 import std/sequtils
-import std/macros
 import std/os
 
 import csvtools
 import uing
+
 from uing/rawui import nil
 
 if paramCount() < 1:
@@ -30,39 +30,16 @@ proc modelCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col
 proc modelSetCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col: cint, val: ptr rawui.TableValue) {.cdecl.} =
   discard # For now...
 
-macro withMenu(menu: Menu, body: varargs[untyped]) = 
-  proc underscorePos(n: NimNode): int =
-    for i in 1 ..< n.len:
-      if n[i].eqIdent("_"): return i
-    return 0
-
-
-  result = newNimNode(nnkStmtList, menu)
-
-  var sym = genSym()  
-  result.add newLetStmt(sym, menu)
-
-  for idx, call in body:
-    var c = newCall(call[idx][0], sym)
-
-    for child in call[idx].children:
-      
-      c.add child
-
-    result.add c
-
-    
-
 proc main =
   var window: Window
 
-  withMenu newMenu("File"):
-    addItem("Open") do (_: MenuItem, win: Window):
-      filename = win.openFile()
-      win.title = filename
+  let fileMenu = newMenu("File")
+  fileMenu.addItem("Open") do (_: MenuItem, win: Window):
+    filename = win.openFile()
+    win.title = filename
 
-    addQuitItem() do () -> bool: 
-      return true
+  fileMenu.addQuitItem() do () -> bool: 
+    return true
 
   window = newWindow("", 800, 600, true)
   window.margined = true

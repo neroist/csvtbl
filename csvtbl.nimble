@@ -11,5 +11,5 @@ bin           = @["csvtbl"]
 # Dependencies
 
 requires "nim >= 1.6.0"
-requires "uing"
 requires "csvtools"
+requires "uing"
