@@ -43,7 +43,12 @@ proc modelCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col
       return newTableValue(val[col - 1]).impl
 
 proc modelSetCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col: cint, val: ptr rawui.TableValue) {.cdecl.} =
-  discard # For now...
+  # col 0 is the "Row" column
+  # row 0 in `rows` are the headers
+  rows[row + 1][col - 1] = $rawui.tableValueString(val)
+
+  if autoSave:
+    saveFile()
 
 proc main =
   var 
@@ -51,9 +56,17 @@ proc main =
     table: Table
 
   let fileMenu = newMenu("File")
-  fileMenu.addItem("Open") do (_: MenuItem, win: Window):
-    filename = win.openFile()
-    win.title = filename
+
+  fileMenu.addItem("Save") do (_: MenuItem, win: Window):
+    saveFile()
+
+  fileMenu.addCheckItem("Enable AutoSave") do (item: MenuItem, _: Window):
+    autoSave = item.checked
+
+  fileMenu.addSeparator()
+
+  fileMenu.addItem("Save As") do (_: MenuItem, win: Window):
+    saveFile(win.saveFile())
 
   fileMenu.addQuitItem() do () -> bool:
     window.destroy()
