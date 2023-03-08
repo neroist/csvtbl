@@ -1,4 +1,5 @@
 import std/sequtils
+import std/strutils
 import std/os
 
 import csvtools
@@ -11,37 +12,57 @@ if paramCount() < 1:
 
   quit QuitFailure
 
-var filename = paramStr(1)
+var 
+  filename = paramStr(1)
+  rows = csvRows(filename).toSeq()
+  autoSave: bool
 
-proc modelNumColumns(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(csvRows(filename).toSeq()[0])
-proc modelNumRows(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(csvRows(filename).toSeq()) - 1
+proc saveFile(file: string = filename) =
+  var writeStr: string
+
+  for csvRow in rows:
+    writestr.add csvRow.join(",")
+    writeStr.add '\n'
+
+  file.writeFile(writeStr)
+
+proc modelNumColumns(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(rows[0])
+proc modelNumRows(mh: ptr TableModelHandler, m: ptr rawui.TableModel): cint {.cdecl.} = cint len(rows) - 1
 proc modelColumnType(mh: ptr TableModelHandler, m: ptr rawui.TableModel, col: cint): TableValueType {.cdecl.} = TableValueTypeString
 
 proc modelCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col: cint): ptr rawui.TableValue {.cdecl.} =
   if col == 0:
     return newTableValue($(row+1)).impl
 
-  let rows = csvRows(filename).toSeq()
-
   for idx, val in rows:
-    if idx == 0: continue
+    if idx < 1: continue
     
+    # row 0 in `rows` are the headers
     if idx == row + 1:
+      # col 0 is the Row column
       return newTableValue(val[col - 1]).impl
 
 proc modelSetCellValue(mh: ptr TableModelHandler, m: ptr rawui.TableModel, row, col: cint, val: ptr rawui.TableValue) {.cdecl.} =
-  discard
+  discard # For now...
 
 proc main =
-  var window: Window
+  var 
+    window: Window
+    table: Table
 
   let fileMenu = newMenu("File")
   fileMenu.addItem("Open") do (_: MenuItem, win: Window):
     filename = win.openFile()
-    win.title = filename.extractFilename()
+    win.title = filename
 
-  fileMenu.addQuitItem() do () -> bool: 
+  fileMenu.addQuitItem() do () -> bool:
+    window.destroy()
     return true
+
+  let editMenu = newMenu("Edit")
+
+  editMenu.addItem("Select All") do (m: MenuItem, win: Window):
+    table.selection = (0 .. len(rows)-1).toSeq()
 
   window = newWindow("", 800, 600, true)
   window.margined = true
@@ -65,13 +86,13 @@ proc main =
   params.model = model.impl
   params.rowBackgroundColorModelColumn = -1
 
-  let table = newTable(addr params)
+  table = newTable(addr params)
   table.selectionMode = TableSelectionModeZeroOrMany
 
   table.addTextColumn("Row", 0, TableModelColumnNeverEditable)
 
-  for idx, header in csvRows(filename).toSeq()[0]:
-    table.addTextColumn(header, idx + 1, TableModelColumnNeverEditable)
+  for idx, header in rows[0]:
+    table.addTextColumn(header, idx + 1, TableModelColumnAlwaysEditable)
 
   box.add table, true
 
